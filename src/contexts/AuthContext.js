@@ -9,7 +9,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, updateDoc, writeBatch } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 
 const AuthContext = createContext();
@@ -218,9 +218,7 @@ export function AuthProvider({ children }) {
   }
 
   // Legacy function for backward compatibility
-  async function updateLoginStreak(userId) {
-    return updateLoginStreakOptimized(userId);
-  }
+  // Removed unused variable updateLoginStreak
 
   // Logout function
   function logout() {
@@ -318,7 +316,7 @@ export function AuthProvider({ children }) {
     });
 
     return unsubscribe;
-  }, []);
+  }, [fetchUserData, userDataCache]);
 
   const value = {
     currentUser,

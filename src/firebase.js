@@ -5,13 +5,14 @@ import { getStorage } from 'firebase/storage';
 import { getAnalytics } from 'firebase/analytics';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCCbic8ckzQXHOcCUlIN7uSTLtFeDPAcdM",
-  authDomain: "auth-59a8f.firebaseapp.com",
-  projectId: "auth-59a8f",
-  storageBucket: "auth-59a8f.firebasestorage.app",
-  messagingSenderId: "392934320628",
-  appId: "1:392934320628:web:25c4608f92df2c7fa131a1",
-  measurementId: "G-F768KVE5VT"
+  // 🔥 REPLACE THESE VALUES WITH YOUR NEW FIREBASE PROJECT CONFIG
+  apiKey: "AIzaSyClzNHbZnUVSxCA3DRaSkLUgGPuISgZHmI" ,
+  authDomain: "richreact-tutorial-hub.firebaseapp.com",
+  projectId: "richreact-tutorial-hub",
+  storageBucket: "richreact-tutorial-hub.firebasestorage.app",
+  messagingSenderId: "691657601903",
+  appId: "1:691657601903:web:3885f8fdd73a1f47fbee9a",
+  measurementId: "G-ED0RG0DWYG"
 };
 
 // Initialize Firebase

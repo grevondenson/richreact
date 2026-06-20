@@ -28,6 +28,7 @@ import Resources from './components/Resources';
 import Community from './components/Community';
 import ResourceViewer from './components/ResourceViewer';
 import ResourceFolderViewer from './components/ResourceFolderViewer';
+import AdminPanel from './components/AdminPanel';
 import authImg from './assets/img/auth.jpg';
 
 // Import toast styles
@@ -83,6 +84,7 @@ function AppWrapper() {
         <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />
         <Route path="/resource/view/:fileId" element={<ProtectedRoute><ResourceViewer /></ProtectedRoute>} />
         <Route path="/resource/folder" element={<ProtectedRoute><ResourceFolderViewer /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute allowedRoles={['teacher']}><AdminPanel /></ProtectedRoute>} />
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       </Routes>
       <Footer />

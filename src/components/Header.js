@@ -6,7 +6,7 @@ import './Header.css';
 const Header = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, userRole } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -45,7 +45,7 @@ const Header = () => {
         setIsSticky(window.scrollY > 200);
       }
     };
-
+  
     // Initial check
     handleScroll();
     
@@ -54,7 +54,7 @@ const Header = () => {
     
     // Cleanup
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [location.pathname]);
+  }, [location.pathname, getHeroSelector]);
 
   const handleLogout = async () => {
     try {
@@ -127,6 +127,9 @@ const Header = () => {
               <div className="user-menu">
                 <span className="user-name">{currentUser.displayName || currentUser.email}</span>
                 <Link className="auth-btn" to="/dashboard" style={{ marginRight: '8px' }}>DASHBOARD</Link>
+                {userRole === 'teacher' && (
+                  <Link className="auth-btn" to="/admin" style={{ marginRight: '8px' }}>ADMIN</Link>
+                )}
                 <button className="auth-btn" onClick={handleLogout}>LOGOUT</button>
               </div>
             ) : (

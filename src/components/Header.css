@@ -40,7 +40,7 @@
   margin-bottom: 10px;
   color: #e36414;
   text-shadow: #030303 4px 0px 2px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
   transition: all 0.3s ease;
 }
 
@@ -87,17 +87,17 @@ nav {
   justify-content: center;
   align-items: center;
   margin: 0;
-  padding: 18px 0;
+  padding: 8px 0;
   transition: padding 0.3s ease;
 }
 
 /* Adjust menu padding when sticky */
 .main-header.sticky .main-menu {
-  padding: 12px 0;
+  padding: 8px 0;
 }
 
 .main-menu li {
-  margin: 0 28px;
+  margin: 0 17px;
   position: relative;
   list-style: none;
 }

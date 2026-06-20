@@ -1,13 +1,64 @@
-import React, { useState } from 'react';
+
+
+import React, { useState, useEffect } from 'react';
+import BookingForm from './BookingForm';
+import { submitFeedback, getRecentFeedback } from '../services/feedback';
+import { toast } from 'react-toastify';
 import './Pricing.css';
 
-const Pricing = () => {
-  const [activeTab, setActiveTab] = useState('per-session');
+const courseLabel = (val) => {
+  switch(val) {
+    case 'organic': return 'Organic Chemistry';
+    case 'physical': return 'Physical Chemistry';
+    case 'analytical': return 'Analytical Chemistry';
+    case 'general': return 'General Chemistry';
+    case 'biochemistry': return 'Biochemistry';
+    case 'inorganic': return 'Inorganic Chemistry';
+    case 'ap': return 'AP Chemistry';
+    default: return val;
+  }
+};
 
-  const scrollToSection = (id) => {
-    const el = document.getElementById(id);
+const initialFeedbackForm = { name: '', email: '', course: '', feedback: '', rating: 0 };
+
+
+function Pricing() {
+  const [activeTab, setActiveTab] = useState('per-session');
+  const [bookingOpen, setBookingOpen] = useState(false);
+  const [feedbackForm, setFeedbackForm] = useState(initialFeedbackForm);
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
+  const [recentFeedback, setRecentFeedback] = useState([]);
+
+  const handleOpenBooking = () => setBookingOpen(true);
+  const handleCloseBooking = () => setBookingOpen(false);
+
+  const scrollToPricing = () => {
+    const el = document.getElementById('pricing-section');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    getRecentFeedback(5).then(setRecentFeedback);
+  }, []);
+
+  const handleFeedbackSubmit = async (e) => {
+    e.preventDefault();
+    if (!feedbackForm.name || !feedbackForm.email || !feedbackForm.course || !feedbackForm.feedback || !feedbackForm.rating) {
+      toast.error('Please fill in all fields and select a rating.');
+      return;
+    }
+    setSubmittingFeedback(true);
+    try {
+      await submitFeedback(feedbackForm);
+      toast.success('Thank you for your feedback!');
+      setFeedbackForm(initialFeedbackForm);
+      setRecentFeedback(await getRecentFeedback(5));
+    } catch (err) {
+      toast.error('Failed to submit feedback. Please try again.');
+    } finally {
+      setSubmittingFeedback(false);
     }
   };
 
@@ -15,11 +66,11 @@ const Pricing = () => {
     <div className="pricing-page">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
       <section className="hero-pricing">
-        <h1>Master Chemistry with Professional Tutoring</h1>
-        <p>Personalized tutoring across all chemistry curricula, from fundamentals to advanced topics.</p>
+        <h1 className="hero-title">Master Chemistry with Professional Tutoring</h1>
+        <p className="hero-subtitle">Personalized tutoring across all chemistry curricula, from fundamentals to advanced topics.</p>
         <div className="hero-buttons">
-          <button className="btn-primary" onClick={() => scrollToSection('booking-section')}>Book a Session</button>
-          <button className="btn-secondary" onClick={() => scrollToSection('pricing-section')}>View Pricing</button>
+          <button className="btn-primary" onClick={handleOpenBooking}>Book a Session</button>
+          <button className="btn-secondary" onClick={scrollToPricing}>View Pricing</button>
         </div>
         <div className="features">
           <div className="feature-item">
@@ -41,43 +92,20 @@ const Pricing = () => {
       </section>
       <section id="booking-section" className="booking-section">
         <h2>Book Your Tutoring Session</h2>
-        <p>Select a day and time that works for you, and fill in your details to book your chemistry tutoring session.</p>
-        <div className="booking-box">
-          <div className="left-panel">
-            <h4>Select Day & Time</h4>
-            <div className="days">
-              <button className="day-btn active">Mon</button>
-              <button className="day-btn">Tue</button>
-              <button className="day-btn">Wed</button>
-              <button className="day-btn">Thu</button>
-              <button className="day-btn">Fri</button>
-              <button className="day-btn">Sat</button>
-              <button className="day-btn">Sun</button>
-            </div>
-            <h5>Available Time Slots</h5>
-            <div className="time-slots">
-              <button className="time-btn active">9:00 AM</button>
-              <button className="time-btn">10:30 AM</button>
-              <button className="time-btn">1:00 PM</button>
-              <button className="time-btn">2:30 PM</button>
-              <button className="time-btn">4:00 PM</button>
-              <button className="time-btn">5:30 PM</button>
-            </div>
-          </div>
-          <div className="right-panel">
-            <form id="bookingForm">
-              <input type="text" placeholder="Full Name" required />
-              <input type="email" placeholder="Email Address" required />
-              <input type="tel" placeholder="Phone Number" required />
-              <input type="text" placeholder="e.g., Organic Chemistry, Thermodynamics" required />
-              <button type="submit" className="btn-primary">Confirm Booking</button>
-            </form>
-          </div>
-        </div>
+        <p>Click below to book your chemistry tutoring session with Dr. Joseph Anjili.</p>
+        <button className="btn-primary booking-btn" onClick={handleOpenBooking}>
+          Book a Session
+        </button>
+        <BookingForm
+          open={bookingOpen}
+          onClose={handleCloseBooking}
+          tutorId="main-tutor"
+          tutorName="Dr. Joseph Anjili"
+        />
       </section>
       <section id="pricing-section" className="pricing">
-        <h2>Simple, Transparent Pricing</h2>
-        <p>Choose the tutoring package that best fits your learning needs</p>
+        <h2 className="pricing-title">Simple, Transparent Pricing</h2>
+        <p className="pricing-subtitle">Choose the tutoring package that best fits your learning needs</p>
         <div className="pricing-tabs">
           <button
             className={`tab-button${activeTab === 'per-session' ? ' active' : ''}`}
@@ -175,67 +203,48 @@ const Pricing = () => {
         </div>
         )}
         <div className="custom-package">
-          <p>Need a Custom Plan?</p>
+          <p className="custom-title">Need a Custom Plan?</p>
           <p>If you need specialized tutoring for advanced topics or have specific requirements, contact us for a tailored plan.</p>
           <button className="btn-secondary">Contact for Custom Package</button>
         </div>
       </section>
-      <section className="testimonials">
-        <h2>What My Students Say</h2>
-        <p>Discover what students have to say about their tutoring experience and the results they've achieved.</p>
-        <div className="overall-rating">
-          ★★★★★ <span>4.9 overall rating</span>
-        </div>
-        <div className="reviews-grid">
-          <div className="review-card">
-            <p className="review-text">“The tutoring sessions helped me understand reaction mechanisms that I had been struggling with for weeks. My exam grades improved significantly.”</p>
-            <p className="reviewer-name"><strong>Alex Johnson</strong></p>
-            <p className="reviewer-course">Organic Chemistry</p>
-          </div>
-          <div className="review-card">
-            <p className="review-text">“At a first-year student, I was overwhelmed by chemistry concepts. The step-by-step explanations made everything so much clearer. Highly recommend.”</p>
-            <p className="reviewer-name"><strong>Sarah Williams</strong></p>
-            <p className="reviewer-course">General Chemistry</p>
-          </div>
-          <div className="review-card">
-            <p className="review-text">“Thermodynamics seemed impossible until I started these tutoring sessions. The tutor has a gift for making complex topics understandable.”</p>
-            <p className="reviewer-name"><strong>Michael Chen</strong></p>
-            <p className="reviewer-course">Physical Chemistry</p>
-          </div>
-          <div className="review-card">
-            <p className="review-text">“The tutoring helped me connect biochemistry concepts to my pre-med studies. The real-world applications made the material much more engaging.”</p>
-            <p className="reviewer-name"><strong>Erica Rodriguez</strong></p>
-            <p className="reviewer-course">Biochemistry</p>
-          </div>
-          <div className="review-card">
-            <p className="review-text">“I was falling behind in my inorganic chemistry class until I started these sessions. Now I'm one of the top students in my class.”</p>
-            <p className="reviewer-name"><strong>James Wilson</strong></p>
-            <p className="reviewer-course">Inorganic Chemistry</p>
-          </div>
-          <div className="review-card">
-            <p className="review-text">“The exam preparation strategies were invaluable. I earned a 5 on my AP Chemistry exam thanks to the focused tutoring.”</p>
-            <p className="reviewer-name"><strong>Olivia Martinez</strong></p>
-            <p className="reviewer-course">AP Chemistry</p>
-          </div>
-        </div>
-      </section>
       <section className="feedback">
-        <h2>Share Your Experience</h2>
+        <h2 className="feedback-title">Share Your Experience</h2>
         <p>Your feedback helps improve the tutoring experience and assists other students in making informed decisions.</p>
         <div className="feedback-form-container">
           <p>How would you rate your tutoring experience?</p>
           <div className="star-rating">
-            <span className="star" data-value="1">★</span>
-            <span className="star" data-value="2">★</span>
-            <span className="star" data-value="3">★</span>
-            <span className="star" data-value="4">★</span>
-            <span className="star" data-value="5">★</span>
+            {[1,2,3,4,5].map((star) => (
+              <span
+                key={star}
+                className="star"
+                style={{ color: star <= (feedbackForm.rating || 0) ? '#e36414' : '#ccc', cursor: 'pointer', fontSize: '2rem' }}
+                onClick={() => setFeedbackForm(f => ({ ...f, rating: star }))}
+                data-value={star}
+              >★</span>
+            ))}
           </div>
-          <form>
-            <input type="text" placeholder="Your Name" />
-            <input type="email" placeholder="Email Address" />
-            <select>
-              <option selected disabled>Select Course</option>
+          <form onSubmit={handleFeedbackSubmit} className="feedback-form">
+            <input
+              type="text"
+              placeholder="Your Name"
+              value={feedbackForm.name}
+              onChange={e => setFeedbackForm(f => ({ ...f, name: e.target.value }))}
+              required
+            />
+            <input
+              type="email"
+              placeholder="Email Address"
+              value={feedbackForm.email}
+              onChange={e => setFeedbackForm(f => ({ ...f, email: e.target.value }))}
+              required
+            />
+            <select
+              value={feedbackForm.course}
+              onChange={e => setFeedbackForm(f => ({ ...f, course: e.target.value }))}
+              required
+            >
+              <option value="" disabled>Select Course</option>
               <option value="organic">Organic Chemistry</option>
               <option value="physical">Physical Chemistry</option>
               <option value="analytical">Analytical Chemistry</option>
@@ -244,9 +253,29 @@ const Pricing = () => {
               <option value="inorganic">Inorganic Chemistry</option>
               <option value="ap">AP Chemistry</option>
             </select>
-            <textarea placeholder="Your Feedback"></textarea>
-            <button type="submit" className="btn-primary">Submit Feedback</button>
+            <textarea
+              placeholder="Your Feedback"
+              value={feedbackForm.feedback}
+              onChange={e => setFeedbackForm(f => ({ ...f, feedback: e.target.value }))}
+              required
+            />
+            <button type="submit" className="btn-primary" disabled={submittingFeedback}>
+              {submittingFeedback ? 'Submitting...' : 'Submit Feedback'}
+            </button>
           </form>
+        </div>
+        <div className="recent-feedback">
+          <h3>Recent Student Feedback</h3>
+          {recentFeedback.length === 0 && <p>No feedback yet. Be the first to share your experience!</p>}
+          <div className="feedback-list">
+            {recentFeedback.map(fb => (
+              <div key={fb.id} className="review-card">
+                <p className="review-text">{fb.feedback}</p>
+                <p className="reviewer-name"><strong>{fb.name}</strong> <span style={{ color: '#e36414' }}>{'★'.repeat(fb.rating || 0)}</span></p>
+                <p className="reviewer-course">{fb.course && courseLabel(fb.course)}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </div>

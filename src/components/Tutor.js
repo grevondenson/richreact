@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { getLessons } from "../services/firestore";
 import { doc, updateDoc, arrayUnion, increment } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { Container, Card, CardContent, Typography, Button, Tabs, Tab, Box } from "@mui/material";
 import { toast } from "react-toastify";
-import TeacherUploadForm from "./TeacherUploadForm";
 import './Tutor.css';
 
 const Tutor = () => {
   // State for Firestore lessons
-  const { user } = useAuth();
+  const { currentUser, userRole } = useAuth();
+  const navigate = useNavigate();
   const [lessons, setLessons] = useState([]);
   const [tab, setTab] = useState("lesson");
-  const [editingLesson, setEditingLesson] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [showUploadForm, setShowUploadForm] = useState(false);
-  const [uploadType, setUploadType] = useState("lesson"); // "lesson", "schedule", "video"
 
   const fetchLessons = async () => {
     setLoading(true);
@@ -42,7 +40,7 @@ const Tutor = () => {
   };
 
   const handleDownload = async (lessonId, fileURL) => {
-    if (!user) {
+    if (!currentUser) {
       toast.error("Please log in to download");
       return;
     }
@@ -61,17 +59,6 @@ const Tutor = () => {
 
   const filteredLessons = lessons.filter((lesson) => lesson.type === tab || (tab === "lesson" && lesson.type === "schedule"));
 
-  // Dashboard action handlers
-  const handleShowForm = (type) => {
-    setUploadType(type);
-    setShowUploadForm(true);
-    setEditingLesson(null);
-  };
-  const handleCloseForm = () => {
-    setShowUploadForm(false);
-    setEditingLesson(null);
-  };
-
   return (
     <div className="tutor-page">
       <div className="container-tutor">
@@ -79,28 +66,28 @@ const Tutor = () => {
           <span className="badge">Professional Chemistry Tutorials</span>
           <h1>
             Master Chemistry With <br />
-            <span className="highlight">Dr. Joseph Akasa</span>
+            <span className="highlight">Dr. Joseph Anjili</span>
           </h1>
           <p>
-            With over 30 years of experience mastering all major chemistry curriculums, I bring a wealth of expertise to every lesson, ensuring students receive guidance that is both comprehensive and deeply informed. My specialization in private tutoring allows me to deliver a unique, individualized approach—tailoring each session to the specific learning needs and goals of my students. This personalized method not only simplifies complex concepts but also empowers learners at every level, from high school to university, to achieve their full potential in chemistry
+            With over 32 years of experience mastering all major chemistry curriculums, I bring a wealth of expertise to every lesson, ensuring students receive guidance that is both comprehensive and deeply informed. My specialization in private tutoring allows me to deliver a unique, individualized approach—tailoring each session to the specific learning needs and goals of my students. This personalized method not only simplifies complex concepts but also empowers learners at every level, from high school to university, to achieve their full potential in chemistry
           </p>
           <div className="buttons">
             <button className="primary-btn">Book a Session →</button>
-            <button className="secondary-btn">View Pricing</button>
+            <button className="secondary-btn" onClick={() => navigate('/pricing')}>View Pricing</button>
           </div>
           <div className="features-row">
             <div className="feature">
               <span className="icon" role="img" aria-label="microscope">🔬</span>
               <div>
-                <strong>Qualified Expert</strong><br />
-                Certified professional in Chemistry with 30+ years experience
+                <strong>Qualified Professional Teacher </strong><br />
+                Certified professional teacher of  Chemistry with 32 years of experience
               </div>
             </div>
             <div className="feature">
               <span className="icon" role="img" aria-label="book">📘</span>
               <div>
-                <strong>Custom Curriculum</strong><br />
-                Tailored to your learning needs
+                <strong>Customised Curriculum</strong><br />
+                Tailored & personalized tothe learners potential, pace and needs
               </div>
             </div>
           </div>
@@ -111,31 +98,8 @@ const Tutor = () => {
         </div>
       </div>
 
-      {/* Teacher dashboard actions */}
-      {user?.role === "teacher" && (
-        <div className="dashboard-actions" style={{ margin: '32px 0 16px 0', display: 'flex', gap: 12 }}>
-          <Button variant="contained" onClick={() => handleShowForm("lesson")}>Add Lesson</Button>
-          <Button variant="contained" onClick={() => handleShowForm("schedule")}>Schedule Lesson</Button>
-          <Button variant="contained" onClick={() => handleShowForm("video")}>Add Video</Button>
-        </div>
-      )}
-
       {/* Dynamic Lessons/Videos Section */}
       <Container role="region" aria-label="Lessons and Videos Section" sx={{ mt: 4 }}>
-        {user?.role === "teacher" && showUploadForm && (
-          <div style={{ marginBottom: 32 }}>
-            <TeacherUploadForm
-              lessonToEdit={editingLesson}
-              onSuccess={() => {
-                fetchLessons();
-                handleCloseForm();
-              }}
-              onCancel={handleCloseForm}
-              initialType={uploadType}
-              key={editingLesson?.id || uploadType || "new"}
-            />
-          </div>
-        )}
         <Tabs value={tab} onChange={handleTabChange} aria-label="Lesson type tabs">
           <Tab label="Upcoming Lessons" value="lesson" aria-label="View upcoming lessons" />
           <Tab label="Videos" value="video" aria-label="View videos" />
@@ -152,6 +116,17 @@ const Tutor = () => {
               <CardContent>
                 <Typography variant="h6">{lesson.title}</Typography>
                 <Typography color="textSecondary">Type: {lesson.type}</Typography>
+                {lesson.date && (
+                  <Typography color="textSecondary">Date: {lesson.date}</Typography>
+                )}
+                {lesson.time && (
+                  <Typography color="textSecondary">Time: {lesson.time}</Typography>
+                )}
+                {lesson.info && (
+                  <Typography color="textSecondary" sx={{ mt: 1 }}>
+                    {lesson.info}
+                  </Typography>
+                )}
                 {lesson.fileURL && (
                   <Button
                     variant="contained"
@@ -160,20 +135,6 @@ const Tutor = () => {
                     aria-label={`Download ${lesson.title}`}
                   >
                     Download
-                  </Button>
-                )}
-                {user?.role === "teacher" && (
-                  <Button
-                    variant="outlined"
-                    onClick={() => {
-                      setEditingLesson(lesson);
-                      setShowUploadForm(true);
-                      setUploadType(lesson.type);
-                    }}
-                    sx={{ mt: 1, ml: 1 }}
-                    aria-label={`Edit ${lesson.title}`}
-                  >
-                    Edit
                   </Button>
                 )}
               </CardContent>

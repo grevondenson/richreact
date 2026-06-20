@@ -78,19 +78,19 @@ body:has(.main-header.sticky) .contact-section {
   font-size: 2rem;
   margin-bottom: 1rem;
   font-weight: 680;
-  text-shadow: #000000 2px 0px 1px;
+  text-shadow: #000000 2.8px 0px 1px;
 }
 
 .hero-home p {
-  font-size: 1.4rem;
-  margin-bottom: 2rem;
+  font-size: 1.7rem;
+  margin-bottom: 1.8rem;
   font-weight: 580;
-  color: #000000 ;
-  text-shadow: #cfcece 2px 0px 0.8px;
+  color: #ffffff ;
+  text-shadow: #000000 0.8px 0px 0.8px;
 }
 
 .hero-home a{
-  color: #f7f8fa;
+  color: #000000;
   text-decoration: none;
   font-weight: 580;
   text-shadow: #0c0c0c 2.8px 0px 2px;

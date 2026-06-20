@@ -2,12 +2,11 @@
 import { db } from "../firebase";
 import {
   collection,
-  addDoc,
   getDocs,
   query,
   where,
-  Timestamp
 } from "firebase/firestore";
+// Removed unused imports: addDoc, Timestamp
 
 // Collection references
 export const resourcesCollection = collection(db, "resources");
@@ -49,12 +48,14 @@ export const getResourcesByType = async (type) => {
 // Fetch all lessons
 export const getLessons = async () => {
   try {
-    const querySnapshot = await getDocs(lessonsCollection);
-    const lessons = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    console.log("Fetched lessons:", lessons);
-    return lessons;
+    const lessonsCollection = collection(db, "lessons");
+    const snapshot = await getDocs(lessonsCollection);
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
-    console.error("Error fetching lessons:", error);
-    throw error;
+    throw new Error("Failed to fetch lessons: " + error.message);
   }
-}; 
+};
+
+export const lessons = collection(db, "lessons"); 
+// Export storage from firebase config
+export { storage } from "../firebase";

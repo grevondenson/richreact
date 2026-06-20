@@ -1,5 +1,4 @@
-import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+// Removed unused imports: React, useState, useMemo, useNavigate
 import './PapersLanding.css';
 
 
@@ -121,6 +120,24 @@ const aqaAsChemPapers = [
 ];
 
 const cieAsChemPapers = [
+   {
+    year:"2025",
+    papers: [
+      { label: "June 2025 Paper 1,2,3,4,5: 9701/...", qpUrl: "https://drive.google.com/drive/folders/13RYsOt8UhL9vAj_ym25vGgoGG4-lUXqh?usp=drive_link", msUrl: "https://drive.google.com/drive/folders/1kLgjrgAueil_k7mDztCaM3t0EDNMNy-U?usp=drive_link", board: "CIE A Level" },
+    ]
+  },
+  {
+    year:"2024",
+    papers: [
+      { label: "June 2024 Paper 1,2,3,4,5: 9701/...", qpUrl: "https://drive.google.com/drive/folders/1mWrqQByJY8dc1nAQ-GhAQfVA3StWSsFP?usp=drive_link", msUrl: "https://drive.google.com/drive/folders/1VuHLtNvKE-VUF_B1bKdF74VF2_Qoz__F?usp=drive_link", board: "CIE A Level" },
+    ]
+  },
+  {
+    year:"2023",
+    papers: [
+      { label: "June 2023 Paper 1,2,3,4,5: 9701/...", qpUrl: "https://drive.google.com/drive/folders/1KN40LpGbpH8d1_uD7FfnXdzBQIQKnpbF?usp=drive_link", msUrl: "https://drive.google.com/drive/folders/1QC5sK5bSx58o6XGYWPidIaxvKMYFxE4a?usp=drive_link", board: "CIE A Level" },
+    ]
+  },
   {
     year: "2022",
     papers: [
@@ -379,6 +396,24 @@ const aqaALevelChemPapers = [
 ];
 
 const cieALevelChemPapers = [
+  {
+    year:"2025",
+    papers: [
+      { label: "June 2025 Paper 1,2,3,4,5: 9701/...", qpUrl: "https://drive.google.com/drive/folders/13RYsOt8UhL9vAj_ym25vGgoGG4-lUXqh?usp=drive_link", msUrl: "https://drive.google.com/drive/folders/1kLgjrgAueil_k7mDztCaM3t0EDNMNy-U?usp=drive_link", board: "CIE A Level" },
+    ]
+  },
+  {
+    year:"2024",
+    papers: [
+      { label: "June 2024 Paper 1,2,3,4,5: 9701/...", qpUrl: "https://drive.google.com/drive/folders/1mWrqQByJY8dc1nAQ-GhAQfVA3StWSsFP?usp=drive_link", msUrl: "https://drive.google.com/drive/folders/1VuHLtNvKE-VUF_B1bKdF74VF2_Qoz__F?usp=drive_link", board: "CIE A Level" },
+    ]
+  },
+  {
+    year:"2023",
+    papers: [
+      { label: "June 2023 Paper 1,2,3,4,5: 9701/...", qpUrl: "https://drive.google.com/drive/folders/1KN40LpGbpH8d1_uD7FfnXdzBQIQKnpbF?usp=drive_link", msUrl: "https://drive.google.com/drive/folders/1QC5sK5bSx58o6XGYWPidIaxvKMYFxE4a?usp=drive_link", board: "CIE A Level" },
+    ]
+  },
   
   {
     year: "2022",
@@ -912,6 +947,18 @@ const wjecALevelChemPapers = [
 
   const cambridgeCIEIGCSEChemPapers = [
     {
+    year:"2025",
+    papers: [
+      { label: "June 2025 Papers", qpUrl: "https://drive.google.com/drive/folders/17uLGpqOWq-4T3rSjTli_PqqvpZT5xcOr?usp=drive_link", msUrl: "https://drive.google.com/drive/folders/1zc34Q6RxxVK5CSYJlDnX391AAHOnl5OE?usp=drive_link", board: "CIE GCSE Level" },
+    ]
+    },
+    {
+    year:"2024",
+    papers: [
+      { label: "June 2024 Papers", qpUrl: "https://drive.google.com/drive/folders/1H7H08HNdQeinGJo-xdrsMNNxPwscbBAu?usp=drive_link", msUrl: "https://drive.google.com/drive/folders/1jgvc0n-ElS-7htNcHZW7EesdbP1j__gu?usp=drive_link", board: "CIE GCSE Level" },
+    ]
+    },
+    {
       year: "2023",
       papers: [
         { label: "2023  Papers ", qpUrl: "https://drive.google.com/drive/folders/1ITohbZwoM-krDTn6KnGscmTKULSQvveX?usp=drive_link", msUrl: "https://drive.google.com/drive/folders/1WWmMWzG5cfGxPMFtwnnv5-7sNpwGgKR4?usp=drive_link", board: "Cambridge CIE IGCSE Chemistry" },
@@ -1072,6 +1119,18 @@ const wjecALevelChemPapers = [
   ];
   
   const cieOLevelChemPapers = [
+    {
+    year:"2024",
+    papers: [
+      { label: "June 2024 Papers 1,2,3,4:", qpUrl: "https://drive.google.com/drive/folders/1GZffinBYCIvYtldyov6i_MA2htBP7kgU?usp=drive_link", msUrl: "https://drive.google.com/drive/folders/1O3Yfp_-xiKDHQ7ZZMb2j-LCkupHIDyFl?usp=drive_link", board: "CIE O Level" },
+    ]
+    },
+    {
+    year:"2023",
+    papers: [
+      { label: "June 2023 Papers 1,2,3,4:", qpUrl: "https://drive.google.com/drive/folders/1YPd162UEvVfcuHG5e-_KTYd4pCvfN_rP?usp=drive_link", msUrl: "https://drive.google.com/drive/folders/1ame4LE1Wm8NIBcFDr2W2qYrwUABUueNk?usp=drive_link", board: "CIE O Level" },
+    ]
+    },
     {
       year: "2022",
       papers: [

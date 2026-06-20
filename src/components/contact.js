@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebase';
+import { toast } from 'react-toastify';
+// Removed debug-contact import (module not found)
 import './contact.css';
 
 const profile = {
@@ -37,6 +41,96 @@ const skills = [
 
 const ContactPage = () => {
   const [tab, setTab] = useState('overview');
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    console.log('🔄 Contact form submission started...');
+    console.log('📋 Form data:', formData);
+
+    try {
+      // Validate form data
+      if (!formData.fullName || !formData.email || !formData.subject || !formData.message) {
+        toast.error('Please fill in all fields');
+        console.log('❌ Validation failed: Missing required fields');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        toast.error('Please enter a valid email address');
+        console.log('❌ Validation failed: Invalid email format');
+        setIsSubmitting(false);
+        return;
+      }
+
+      console.log('✅ Form validation passed');
+      console.log('🔥 Attempting to submit to Firestore...');
+
+
+      // Removed testResult usage (no-undef error)
+
+      // Submit to Firestore
+      const docRef = await addDoc(collection(db, 'contact_submissions'), {
+        ...formData,
+        submittedAt: serverTimestamp(),
+        status: 'new', // new, read, replied
+        source: 'contact_form'
+      });
+
+      console.log('✅ Contact form submitted successfully! Document ID:', docRef.id);
+      toast.success('Message sent successfully! We\'ll get back to you soon.');
+      
+      // Reset form
+      setFormData({
+        fullName: '',
+        email: '',
+        subject: '',
+        message: ''
+      });
+
+    } catch (error) {
+      console.error('❌ Error submitting contact form:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      console.error('Full error object:', error);
+      
+      // Enhanced error messages based on error type
+      if (error.code === 'permission-denied') {
+        toast.error('Permission denied. Contact form access is restricted.');
+        console.error('🚫 Firestore security rules are denying write access to contact_submissions');
+      } else if (error.code === 'unavailable') {
+        toast.error('Service temporarily unavailable. Please try again later.');
+      } else if (error.code === 'invalid-argument') {
+        toast.error('Invalid form data. Please check your inputs.');
+      } else if (error.code === 'unauthenticated') {
+        toast.error('Authentication required. Please refresh the page.');
+      } else {
+        toast.error(`Failed to send message: ${error.message}`);
+      }
+      
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="container-contact shadow-dark">
@@ -96,28 +190,56 @@ const ContactPage = () => {
               Have a question or want to work together? Fill out the form below and I'll get back to you as soon as possible.
             </span>
           </div>
-          <form className="contact-form">
+          <form className="contact-form" onSubmit={handleSubmit}>
             <div className="contact-form-row">
               <div style={{ flex: 1 }}>
                 <label>Full Name</label>
-                <input type="text" placeholder="Your name" />
+                <input 
+                  type="text" 
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  placeholder="Your name"
+                  required
+                />
               </div>
               <div style={{ flex: 1 }}>
                 <label>Email Address</label>
-                <input type="email" placeholder="your@email.com" />
+                <input 
+                  type="email" 
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="your@email.com"
+                  required
+                />
               </div>
             </div>
             <div>
               <label>Subject</label>
-              <input type="text" placeholder="How can I help you?" />
+              <input 
+                type="text" 
+                name="subject"
+                value={formData.subject}
+                onChange={handleInputChange}
+                placeholder="How can I help you?"
+                required
+              />
             </div>
             <div>
               <label>Message</label>
-              <textarea placeholder="Enter your message here..." />
+              <textarea 
+                name="message"
+                value={formData.message}
+                onChange={handleInputChange}
+                placeholder="Enter your message here..."
+                rows="5"
+                required
+              />
             </div>
-            <button type="submit">
+            <button type="submit" disabled={isSubmitting}>
               <i className="fa fa-paper-plane" style={{ marginRight: 8 }}></i>
-              Send Message
+              {isSubmitting ? 'Sending...' : 'Send Message'}
             </button>
           </form>
         </section>

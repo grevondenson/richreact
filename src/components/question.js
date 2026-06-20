@@ -1,4 +1,7 @@
 import React, { useRef, useState } from 'react';
+import { addDoc, serverTimestamp } from 'firebase/firestore';
+import { questionsCollection } from '../services/questions';
+import { toast } from 'react-toastify';
 import './questions.css';
 
 const features = [
@@ -23,6 +26,14 @@ const QuestionPage = () => {
   const fileInputRef = useRef();
   const [dragActive, setDragActive] = useState(false);
   const [uploadText, setUploadText] = useState('Drag & drop files here, or click to browse');
+  const [form, setForm] = useState({
+    fullName: '',
+    email: '',
+    subject: '',
+    question: '',
+    attachments: []
+  });
+  const [submitting, setSubmitting] = useState(false);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -44,6 +55,39 @@ const QuestionPage = () => {
   };
   const handleClick = () => {
     fileInputRef.current.click();
+  };
+
+  // Handle form field changes
+  const handleChange = (e) => {
+    const { id, value, files } = e.target;
+    if (id === 'attachments') {
+      setForm((prev) => ({ ...prev, attachments: files }));
+      setUploadText(files.length > 0 ? files.length + ' file(s) selected' : 'Drag & drop files here, or click to browse');
+    } else {
+      setForm((prev) => ({ ...prev, [id]: value }));
+    }
+  };
+
+  // Handle form submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      await addDoc(questionsCollection, {
+        fullName: form.fullName,
+        email: form.email,
+        subject: form.subject,
+        question: form.question,
+        createdAt: serverTimestamp(),
+        // attachments: not implemented yet
+      });
+      toast.success('Question sent successfully!');
+      setForm({ fullName: '', email: '', subject: '', question: '', attachments: [] });
+      setUploadText('Drag & drop files here, or click to browse');
+    } catch (err) {
+      toast.error('Failed to send question. Please try again.');
+    }
+    setSubmitting(false);
   };
 
   return (
@@ -68,22 +112,22 @@ const QuestionPage = () => {
       <div className="row">
         <div className="col-12">
           <h2>Ask Your Question</h2>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="fullName">Full Name</label>
-              <input type="text" className="form-control" id="fullName" placeholder="Enter your full name" required />
+              <input type="text" className="form-control" id="fullName" value={form.fullName} onChange={handleChange} placeholder="Enter your full name" required />
             </div>
             <div className="form-group">
-              <label htmlFor="emailAddress">Email Address</label>
-              <input type="email" className="form-control" id="emailAddress" placeholder="Enter your email address" required />
+              <label htmlFor="email">Email Address</label>
+              <input type="email" className="form-control" id="email" value={form.email} onChange={handleChange} placeholder="Enter your email address" required />
             </div>
             <div className="form-group">
               <label htmlFor="subject">Subject</label>
-              <input type="text" className="form-control" id="subject" placeholder="What's your question about?" required />
+              <input type="text" className="form-control" id="subject" value={form.subject} onChange={handleChange} placeholder="What's your question about?" required />
             </div>
             <div className="form-group">
               <label htmlFor="question">Your Question</label>
-              <textarea className="form-control" id="question" rows="3" placeholder="Describe your question in detail..." required></textarea>
+              <textarea className="form-control" id="question" value={form.question} onChange={handleChange} rows="3" placeholder="Describe your question in detail..." required></textarea>
             </div>
             <div className="form-group">
               <label htmlFor="attachments">Attachments (Optional)</label>
@@ -101,11 +145,11 @@ const QuestionPage = () => {
                   id="attachments"
                   multiple
                   ref={fileInputRef}
-                  onChange={handleFileChange}
+                  onChange={handleChange}
                 />
               </div>
             </div>
-            <button type="submit" className="btn-primary">Send Question</button>
+            <button type="submit" className="btn-primary" disabled={submitting}>{submitting ? 'Sending...' : 'Send Question'}</button>
           </form>
         </div>
       </div>
